@@ -4,7 +4,7 @@ A Nextflow plugin that automatically intercepts pipeline completion events and u
 
 ## Generic REST API Compatibility
 
-This plugin is designed to be **fully generic** and contains **no hardcoded web links, API URLs, or endpoints** in its source code. It can be used to update any LIMS, database, or external service that exposes a REST API endpoint compatible with its request format. 
+This plugin is designed to be **fully generic** and can be used to update any LIMS, database, or external service that exposes a REST API endpoint compatible with its request format. 
 
 All connection details, including base URLs and credentials, are resolved dynamically at runtime using Nextflow parameter values.
 
