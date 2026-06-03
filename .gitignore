@@ -1,0 +1,19 @@
+# Nextflow build & execution artifacts
+.nextflow
+.nextflow.log*
+work/
+validation_run.log
+validation_server.log
+
+# Gradle artifacts
+.gradle/
+build/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Scaffold directory
+/plugin/
