@@ -44,14 +44,29 @@ cat validation_run.log
 echo "===================================================="
 echo "Step 4: Verifying LIMS Observer Log Output..."
 echo "===================================================="
-if grep -q "LIMS response: SUCCESS (200)" .nextflow.log; then
-    echo ""
-    echo "🎉 SUCCESS: The LIMS Observer successfully intercepted flow completion and posted the status to LIMS!"
-    echo ""
-    exit 0
+
+# Print server log for visibility
+echo "--- Mock LIMS Server Log Output ---"
+cat validation_server.log || true
+echo "-----------------------------------"
+
+# Check status PATCH request
+if grep -q "custom_status_field" validation_server.log; then
+    echo "✓ Custom status field successfully received by server."
 else
-    echo ""
-    echo "❌ FAILURE: LIMS response log success pattern not found in nextflow logs."
-    echo ""
+    echo "❌ FAILURE: Custom status field not found in server logs."
     exit 1
 fi
+
+# Check file upload POST request
+if grep -q "LIMS file upload response: SUCCESS (200)" .nextflow.log; then
+    echo "✓ File upload logged successfully."
+else
+    echo "❌ FAILURE: LIMS file upload success log not found."
+    exit 1
+fi
+
+echo ""
+echo "🎉 SUCCESS: The LIMS Observer successfully updated the status and uploaded the file!"
+echo ""
+exit 0

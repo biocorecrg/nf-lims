@@ -15,8 +15,14 @@ The plugin checks the Nextflow session parameters for the following keys:
 * `params.lims_pipeline_execution_id`: The execution or run ID to append to the base URL.
 * `params.lims_username` (optional): The username for API authentication.
 * `params.lims_api_key` (optional): The API key/token for API authentication.
+* `params.lims_status_key` (optional): The JSON key name for the status parameter (defaults to `'status'`).
 * `params.lims_status_success` (optional): The custom status value sent on success (defaults to `'SU'`).
 * `params.lims_status_failure` (optional): The custom status value sent on failure (defaults to `'FA'`).
+* `params.lims_upload_file` (optional): Local file path to upload (e.g. `'results/multiqc_report.html'`). If not defined, file upload is skipped.
+* `params.lims_upload_url` (optional): Endpoint URL for the file upload (defaults to `{lims_api_base_url}/{lims_pipeline_execution_id}/upload`).
+* `params.lims_upload_method` (optional): HTTP method to use for file upload (e.g. `'POST'`, `'PUT'`. Defaults to `'POST'`).
+* `params.lims_upload_mode` (optional): Body format for the file upload, either `'multipart'` (for standard `multipart/form-data`) or `'binary'` (for raw binary upload). Defaults to `'multipart'`.
+* `params.lims_upload_form_field` (optional): The name of the form field parameter for the file when `lims_upload_mode` is `'multipart'` (defaults to `'file'`).
 
 When a pipeline completes, the plugin issues a `PATCH` request to:
 ```
@@ -44,14 +50,17 @@ params {
     lims_pipeline_execution_id = '12345'
     lims_username              = 'your-username'
     lims_api_key               = 'your-api-key'
-    lims_status_success        = 'SU' // Optional: Custom status value for success
-    lims_status_failure        = 'FA' // Optional: Custom status value for failure
+    lims_status_key            = 'status' // Optional: Custom JSON key for status parameter
+    lims_status_success        = 'SU'     // Optional: Custom status value for success
+    lims_status_failure        = 'FA'     // Optional: Custom status value for failure
+    lims_upload_file           = 'results/multiqc_report.html' // Optional: File to upload on completion
+    lims_upload_mode           = 'multipart' // Optional: 'multipart' or 'binary'
 }
 ```
 
 ### Action Logic & Request Payload
 
-When the pipeline finishes, the plugin fires a native `PATCH` request to:
+When the pipeline finishes, the plugin fires a native `PATCH` request to update status:
 `{lims_api_base_url}/{lims_pipeline_execution_id}`
 
 #### HTTP Request Details:
@@ -63,10 +72,24 @@ When the pipeline finishes, the plugin fires a native `PATCH` request to:
 * **Payload Schema**:
   ```json
   {
-    "status": "SU"
+    "<lims_status_key>": "<lims_status_success/lims_status_failure>"
   }
   ```
-  * `status` (string): The status of the pipeline run. It defaults to `"SU"` on success and `"FA"` on failure, but can be overridden with the custom status parameter values config (`lims_status_success` / `lims_status_failure`).
+  * The status key defaults to `"status"` but is customizable via `lims_status_key`.
+  * The status value defaults to `"SU"` on success and `"FA"` on failure, but is customizable via `lims_status_success` and `lims_status_failure`.
+
+### File Upload Logic
+
+If `params.lims_upload_file` is defined, the plugin automatically uploads the specified file upon completion.
+
+#### HTTP Request Details:
+* **Method**: Customizable via `lims_upload_method` (defaults to `POST`).
+* **Upload URL**: Defaults to `{lims_api_base_url}/{lims_pipeline_execution_id}/upload` but can be overridden with `lims_upload_url`.
+* **Headers**:
+  * `Authorization: ApiKey {lims_username}:{lims_api_key}` (if credentials provided)
+  * `Content-Type`: Automatically set based on the `lims_upload_mode`:
+    * `'multipart'`: `multipart/form-data; boundary=...` (sends the file within form field name specified by `lims_upload_form_field`, defaulting to `'file'`).
+    * `'binary'`: The parsed content type of the file (e.g. `text/html`, `application/octet-stream`). Sends the file as raw request body.
 
 ---
 
