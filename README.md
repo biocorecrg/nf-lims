@@ -49,20 +49,24 @@ params {
 }
 ```
 
-### Action Logic
+### Action Logic & Request Payload
 
 When the pipeline finishes, the plugin fires a native `PATCH` request to:
 `{lims_api_base_url}/{lims_pipeline_execution_id}`
 
-With the following JSON payload containing the dynamically determined status code:
-```json
-{
-  "status": "SU" // or the value of lims_status_success / lims_status_failure
-}
-```
-
-And includes the authentication header:
-`Authorization: ApiKey {lims_username}:{lims_api_key}`
+#### HTTP Request Details:
+* **Method**: `PATCH`
+* **Headers**:
+  * `Content-Type: application/json`
+  * `Authorization: ApiKey {lims_username}:{lims_api_key}` (Only sent if both `lims_username` and `lims_api_key` are provided)
+* **Payload Format**: JSON
+* **Payload Schema**:
+  ```json
+  {
+    "status": "SU"
+  }
+  ```
+  * `status` (string): The status of the pipeline run. It defaults to `"SU"` on success and `"FA"` on failure, but can be overridden with the custom status parameter values config (`lims_status_success` / `lims_status_failure`).
 
 ---
 
