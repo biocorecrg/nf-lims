@@ -1,6 +1,8 @@
-# nf-lims Nextflow Plugin
+# nf-crg-genomics-lims Nextflow Plugin
 
 A Nextflow plugin that automatically intercepts pipeline completion events and updates a target Laboratory Information Management System (LIMS) or API endpoint with the pipeline status (`SU` for Success, `FA` for Failure).
+
+This plugin is used at the **Centre for Genomic Regulation (CRG)** by the **Genomics Unit** to track and automatically log nextflow workflow execution outcomes directly into the CRG LIMS platform.
 
 ## Generic REST API Compatibility
 
@@ -42,7 +44,7 @@ To enable the plugin, add it to your pipeline's `nextflow.config`:
 
 ```groovy
 plugins {
-    id 'nf-lims@0.1.0'
+    id 'nf-crg-genomics-lims@0.1.0'
 }
 
 params {

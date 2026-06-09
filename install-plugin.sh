@@ -5,7 +5,7 @@
 
 set -e
 
-PLUGIN_ID="nf-lims"
+PLUGIN_ID="nf-crg-genomics-lims"
 PLUGIN_VERSION="0.1.0"
 PLUGIN_DIR="$HOME/.nextflow/plugins/${PLUGIN_ID}-${PLUGIN_VERSION}"
 ZIP_FILE="build/distributions/${PLUGIN_ID}-${PLUGIN_VERSION}.zip"
